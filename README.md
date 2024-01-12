@@ -6,6 +6,8 @@ Cadastro de tipo de produto;
 E simulador de venda;
 
 Para executar o projeto deve-se primeira mente criar a base de dados, editar o arquivo config/config.php, com as informações pertinentes a sua base de dados.
-#Comandos:
+# Comandos:
+
 composer install  
+
 php -S localhost:8080
