@@ -67,6 +67,19 @@
 {% endblock %}
 {% block scripts %}
    <script>
+        function CalcTotals(){
+            var totalAll = 0;
+            var totalTaxAll = 0;
+            $("#products tbody tr").each(function() {
+                var rowTax = $(this).find("td:eq(3)").data('tax');
+                var rowTotal = $(this).find("td:eq(4)").data('total');
+
+                totalAll += rowTotal;
+                totalTaxAll += rowTax;
+            });
+            $("#total-items").html(`R$ ${truncateDecimal(totalAll,2)}`);
+            $("#total-tax").html(`R$ ${truncateDecimal(totalTaxAll,2)}`);
+        };
         $("#add-item").click(function(e){
             e.preventDefault();
             
@@ -97,21 +110,12 @@
             // Adicionar a nova linha ao corpo da tabela
             $("#products tbody").append(newRow);
 
-            var totalAll = 0;
-            var totalTaxAll = 0;
-            $("#products tbody tr").each(function() {
-                var rowTax = $(this).find("td:eq(3)").data('tax');
-                var rowTotal = $(this).find("td:eq(4)").data('total');
-
-                totalAll += rowTotal;
-                totalTaxAll += rowTax;
-            });
-            $("#total-items").html(`R$ ${truncateDecimal(totalAll,2)}`);
-            $("#total-tax").html(`R$ ${truncateDecimal(totalTaxAll,2)}`);
+            CalcTotals();
 
         });
         $("#products").on("click", ".btn-remove", function() {
             $(this).closest("tr").remove();
+            CalcTotals();
         });
 
 
