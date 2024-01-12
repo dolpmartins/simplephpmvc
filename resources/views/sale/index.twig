@@ -1,0 +1,156 @@
+{% extends "partials/template.twig" %}
+
+{% block content %}
+    <div class="text-center mt-4">
+        <h1>Sale</h1>
+        <div class="w-100"><br /></div>
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                        <div class="col">
+                            <select class="form-control" id="product" name="product">
+                                <option value="">Select a option</option>
+                                {% for item in products %}
+                                    <option value="{{item['ProductId']}}" data-price="{{item['Price']}}" data-tax="{{item['PercentTax']}}">{{item['Name']}} - R$ {{item['Price']}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control" placeholder="Quantity" name="quantity" id="quantity" value=""/>
+                        </div>
+                        <a  href="#" class="btn btn-success float-right" id="add-item">add</a>    
+                </div>
+                <div class="w-100"><br /></div>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control" placeholder="Name" name="name" value="" readonly/>
+                    </div>
+                    <div class="col">
+                        <input type="number" name="price" min="0" max="100" step="0.01" class="form-control" placeholder="Price" value="" readonly/>
+                    </div>
+                    
+                </div>
+                <div class="w-100"><br /></div>
+                <a  href="#" class="btn btn-success float-right" id="btn-save">save</a>    
+                <div class="w-100"><br /></div>
+                <table class="table table-hover table-light">
+                    <thead>
+                        <tr>
+                            <th scope="col">Total</th>
+                            <th scope="col">Total Tax</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td scope="col" id="total-items"></td>
+                            <td scope="col" id="total-tax"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-hover table-dark" id="products">
+                    <thead>
+                        <tr>
+                            <th scope="col">Prduct</th>
+                            <th scope="col">Unit price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Tax</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+   <script>
+        $("#add-item").click(function(e){
+            e.preventDefault();
+            
+            var productId = $("#product").val();
+            var productText = $("#product option:selected").text();
+            var quantity = $("#quantity").val();
+            
+            if (product === "" || quantity <= 0) {
+                alert("Enter a valid qantity and select a product.");
+                return;
+            }
+
+            
+            var unitPrice = $("#product option:selected").data("price");
+            var tax  = $("#product option:selected").data("tax");
+            var total = unitPrice * quantity;
+            tax = truncateDecimal((tax/100)*total,2);
+            
+            var newRow = $("<tr>");
+            
+            newRow.append(`<td data-productid='${productId}'>${productText}</td>`);
+            newRow.append(`<td data-unitprice='${unitPrice}'>R$ ${unitPrice}</td>`);
+            newRow.append(`<td data-quantity='${quantity}'>${quantity}</td>`);
+            newRow.append(`<td data-tax='${tax}'>R$ ${tax}</td>`);
+            newRow.append(`<td data-total='${total}'>R$ ${total}</td>`);
+            newRow.append(`<button type="button" class="btn btn-danger btn-remove">delete</button>`);
+
+            // Adicionar a nova linha ao corpo da tabela
+            $("#products tbody").append(newRow);
+
+            var totalAll = 0;
+            var totalTaxAll = 0;
+            $("#products tbody tr").each(function() {
+                var rowTax = $(this).find("td:eq(3)").data('tax');
+                var rowTotal = $(this).find("td:eq(4)").data('total');
+
+                totalAll += rowTotal;
+                totalTaxAll += rowTax;
+            });
+            $("#total-items").html(`R$ ${truncateDecimal(totalAll,2)}`);
+            $("#total-tax").html(`R$ ${truncateDecimal(totalTaxAll,2)}`);
+
+        });
+        $("#products").on("click", ".btn-remove", function() {
+            $(this).closest("tr").remove();
+        });
+
+
+        $("#btn-save").on("click", function() {
+            rows = [];
+
+
+            $("#products tbody tr").each(function() {
+                var product = $(this).find("td:eq(0)").data('productid');
+                var unitprice = $(this).find("td:eq(1)").data('unitprice');
+                var quantity = $(this).find("td:eq(2)").data('quantity');
+                var tax = $(this).find("td:eq(3)").data('Tax');
+                var total = $(this).find("td:eq(4)").data('total');
+
+                rows.push({
+                    product: product,
+                    unitprice: unitprice,
+                    quantity: quantity,
+                    total: total
+                });
+            });
+
+            if(rows.length > 0){
+                $.ajax({
+                    url: "sale/save",
+                    method: "POST",
+                    data: { items: rows },
+                    success: function(response) {
+                        var parsedJson = $.parseJSON(response);
+                        console.log(parsedJson.alert);
+                        showAlert(parsedJson.alert);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                        showAlert({type:"error",message:error});
+                    }
+                });
+            }
+
+        });
+   </script>
+{% endblock %}

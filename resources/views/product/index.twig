@@ -1,0 +1,75 @@
+{% extends "partials/template.twig" %}
+
+{% block content %}
+    <div class="text-center mt-4">
+        <h1>List of products</h1>
+        <div class="row">
+            <div class="col-12">
+                <a  href="/product/create" class="btn btn-success float-right">add</a>    
+            </div>
+        </div>
+        <div class="w-100"><br /></div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-hover table-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Product type</th>
+                            <th scope="col">Percent tax</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in products %}
+                            <tr>
+                                 <td>{{ row['ProductId'] }}</td>
+                                 <td>{{ row['Name'] }}</td>
+                                 <td>{{ row['Price'] }}</td>
+                                 <td>{{ row['Type'] }}</td>
+                                 <td>{{ row['PercentTax'] }}</td>
+                                <td>
+                                    <a  href="/product/edit/{{row['ProductId']}}" class="btn btn-success">edit</a> 
+                                    <button type="button" class="btn btn-danger delete-product" data-productid="{{row['ProductId']}}">delete</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(".delete-product").click(function(){
+            $productId = $(this).data("productid");
+            console.log($productId);
+            $("#modal-confirmdeleteLabel").html("Confirm delete product type?");
+            $("#modal-confirmdeleteContent").html("Are you sure you want to remove the record?");
+            $("#confirmdeleteButton").data("valueid",$productId);
+            $('#modal-confirmdelete').modal();
+        });
+
+        $('#modal-confirmdelete .modal-footer button').on('click', function(event) {
+            var $button = $(event.target);
+            $(this).closest('.modal').one('hidden.bs.modal', function() {
+                var $buttonID = $button.attr("id")
+                var $productId = $button.data("valueid");
+                if($buttonID === "confirmdeleteButton"){
+                    $.ajax({
+                        url: `/product/delete/${$productId}`,
+                        type: 'DELETE',
+                        success: function(result) {
+                            var parsedJson = $.parseJSON(result);
+                            console.log(parsedJson.alert);
+                            showAlert(parsedJson.alert);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

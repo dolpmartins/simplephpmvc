@@ -1,0 +1,24 @@
+{
+    "name": "php/mvc",
+    "description": "A simple MVC PHP project ",
+    "type": "project",
+    "version": "1.0.0",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+      {
+        "name": "Diorg Martins"
+      }
+    ],
+    "require": {
+      "php": ">=8.0",
+      "twig/twig": "^2.11.3",
+      "ext-json": "*"
+    },
+    "autoload": {
+      "psr-4": {
+        "App\\": "app/",    
+        "":["bootstrap/"]
+      }
+    }
+  }

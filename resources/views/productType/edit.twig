@@ -1,0 +1,27 @@
+{% extends "partials/template.twig" %}
+
+{% block content %}
+    <div class="text-center mt-4">
+        <h1>Edit product type</h1>
+        <div class="row">
+            <div class="col-12">
+                <form method="post" action="/productType/update/{{productType['ProductTypeId']}}">
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" class="form-control" placeholder="Name" name="name"  value="{{productType['Name']}}"/>
+                        </div>
+                        <div class="col">
+                            <input type="number" name="percentTax" min="0" max="100" step="0.5"  class="form-control" placeholder="Percent Tax" value="{{productType['PercentTax']}}"/>
+                        </div>
+                    </div>
+                    <div class="w-100"><br /></div>
+                    <button type="submit" class="btn btn-success float-right">save</button>
+                    <a  href="/productType/" class="btn btn-light float-right">cancel</a>    
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+
+{% endblock %}

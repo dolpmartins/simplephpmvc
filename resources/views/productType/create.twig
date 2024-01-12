@@ -1,0 +1,31 @@
+{% extends "partials/template.twig" %}
+
+{% block content %}
+    <div class="text-center mt-4">
+        <h1>Create product type</h1>
+        <div class="row">
+            <div class="col-12">
+                <form method="post" action="/productType/save">
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" class="form-control" placeholder="Name" name="name" />
+                        </div>
+                        <div class="col">
+                            <input type="number" name="percentTax" min="0" max="100" step="0.5" value="0.00" class="form-control" placeholder="Percent Tax" />
+                        </div>
+                    </div>
+                    <div class="w-100"><br /></div>
+                    <button type="submit" class="btn btn-success float-right">save</button>
+                    <a  href="/productType/" class="btn btn-light float-right">cancel</a>    
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+    $(".delete-producttype").click(function(){
+        alert(1)
+    });
+    </script>
+{% endblock %}

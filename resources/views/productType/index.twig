@@ -1,0 +1,71 @@
+{% extends "partials/template.twig" %}
+
+{% block content %}
+    <div class="text-center mt-4">
+        <h1>List of product types</h1>
+        <div class="row">
+            <div class="col-12">
+                <a  href="/productType/create" class="btn btn-success float-right">add</a>    
+            </div>
+        </div>
+        <div class="w-100"><br /></div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-hover table-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Percent Tax</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in productTypes %}
+                            <tr>
+                                {% for item in row %}
+                                    <td>{{ item }}</td>
+                                {% endfor %}
+                                <td>
+                                    <a  href="/productType/edit/{{row['ProductTypeId']}}" class="btn btn-success">edit</a> 
+                                    <button type="button" class="btn btn-danger delete-producttype" data-producttypeid="{{row['ProductTypeId']}}">delete</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(".delete-producttype").click(function(){
+            $productTypeId = $(this).data("producttypeid");
+            console.log($productTypeId);
+            $("#modal-confirmdeleteLabel").html("Confirm delete product type?");
+            $("#modal-confirmdeleteContent").html("Are you sure you want to remove the record?");
+            $("#confirmdeleteButton").data("valueid",$productTypeId);
+            $('#modal-confirmdelete').modal();
+        });
+
+        $('#modal-confirmdelete .modal-footer button').on('click', function(event) {
+            var $button = $(event.target);
+            $(this).closest('.modal').one('hidden.bs.modal', function() {
+                var $buttonID = $button.attr("id")
+                var $productTypeId = $button.data("valueid");
+                if($buttonID === "confirmdeleteButton"){
+                    $.ajax({
+                        url: `/productType/delete/${$productTypeId}`,
+                        type: 'DELETE',
+                        success: function(result) {
+                            var parsedJson = $.parseJSON(result);
+                            console.log(parsedJson.alert);
+                            showAlert(parsedJson.alert);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
