@@ -14,7 +14,8 @@ class Product extends ModelBase{
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':producttypeid', $producttypeid);
             $stmt->bindParam(':price', $price);
-            return $stmt->execute();
+            $stmt->execute();
+            return $this->conn->lastInsertId();
         }catch( PDOException $Exception ) {
             error_log($Exception, 0);
             return  0;

@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Models\ProductType;
 use App\Models\Product;
+use App\Core\FormValidation;
 
 class ProductTypeController{
 	
@@ -35,30 +36,54 @@ class ProductTypeController{
     }
 
     public function save(){
-        $productType = new ProductType();
-        $return = $productType->add($_POST['name'], $_POST['percentTax']);
-        if($return){
-            $_SESSION['alert']['type'] = "success";
-            $_SESSION['alert']['message'] = "Create product type successfully.";
-            header('Location: /productType/');
-        }else{
+        $validator = new FormValidation();
+
+        $validator->validateRequired($_POST['name'], 'Name');
+        $validator->validateRequired($_POST['percentTax'], 'Tax');
+        $validator->validateNumber($_POST['percentTax'], 'Tax');
+        if ($validator->hasErrors()) {
+            $errors = $validator->getErrors();
             $_SESSION['alert']['type'] = "danger";
-            $_SESSION['alert']['message'] = "Create product type error.";
+            $_SESSION['alert']['message'] = "update product type error. Errors: " . implode(';', $errors);
             view('productType/create',[]);
+        }else{
+            $productType = new ProductType();
+            $return = $productType->add($_POST['name'], $_POST['percentTax']);
+            if($return){
+                $_SESSION['alert']['type'] = "success";
+                $_SESSION['alert']['message'] = "Create product type successfully.";
+                header('Location: /productType/');
+            }else{
+                $_SESSION['alert']['type'] = "danger";
+                $_SESSION['alert']['message'] = "Create product type error.";
+                view('productType/create',[]);
+            }
         }
     }
 
     public function update($id){
-        $productType = new ProductType();
-        $return = $productType->update($id[0],$_POST['name'], $_POST['percentTax']);
-        if($return){
-            $_SESSION['alert']['type'] = "success";
-            $_SESSION['alert']['message'] = "update product type successfully.";
-            header('Location: /productType/');
-        }else{
+        $validator = new FormValidation();
+
+        $validator->validateRequired($_POST['name'], 'Name');
+        $validator->validateRequired($_POST['percentTax'], 'Tax');
+        $validator->validateNumber($_POST['percentTax'], 'Tax');
+        if ($validator->hasErrors()) {
+            $errors = $validator->getErrors();
             $_SESSION['alert']['type'] = "danger";
-            $_SESSION['alert']['message'] = "update product type error.";
+            $_SESSION['alert']['message'] = "update product type error. Errors: " . implode(';', $errors);
             header('Location: /productType/edit/'.$id);
+        }else{        
+            $productType = new ProductType();
+            $return = $productType->update($id[0],$_POST['name'], $_POST['percentTax']);
+            if($return){
+                $_SESSION['alert']['type'] = "success";
+                $_SESSION['alert']['message'] = "update product type successfully.";
+                header('Location: /productType/');
+            }else{
+                $_SESSION['alert']['type'] = "danger";
+                $_SESSION['alert']['message'] = "update product type error.";
+                header('Location: /productType/edit/'.$id);
+            }
         }
     }
     static function delete($id){

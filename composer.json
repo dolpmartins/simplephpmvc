@@ -20,5 +20,8 @@
         "App\\": "app/",    
         "":["bootstrap/"]
       }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
     }
-  }
+}

@@ -13,7 +13,8 @@ class ProductType extends ModelBase{
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':percentTax', $percentTax);
-            return $stmt->execute();
+            $stmt->execute();
+            return $this->conn->lastInsertId();
         }catch( PDOException $Exception ) {
             error_log($Exception, 0);
             return  0;
